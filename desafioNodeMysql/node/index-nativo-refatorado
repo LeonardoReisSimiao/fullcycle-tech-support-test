@@ -1,0 +1,107 @@
+const express = require("express");
+const app = express();
+
+const port = 3000;
+
+const config = {
+  host: "database",
+  port: "3306",
+  user: "root",
+  password: "root",
+  database: "database",
+};
+
+const mysql = require("mysql2");
+const connection = mysql.createConnection(config);
+
+function tryConnect(connection) {
+  console.log("Tentando conectar ao banco...");
+  let tentativas = 0;
+  const maxTentativas = 10; // 10 tentativas
+
+  return new Promise((resolve, reject) => {
+    const tryConnection = () => {
+      tentativas += 1;
+      connection.connect((err) => {
+        if (err) {
+          console.log(
+            `Tentativa ${tentativas} - Erro ao Conectar: ${err.stack}`
+          );
+          if (tentativas >= maxTentativas) {
+            console.log(
+              "Máximo de tentativas atingidas. Conexão não estabelecida"
+            );
+            reject(err);
+          } else {
+            setTimeout(tryConnection, 20000); // tentativa a cada 20 segundos
+          }
+        } else {
+          console.log("Conectado !");
+          resolve(connection);
+        }
+      });
+    };
+
+    tryConnection();
+  });
+}
+
+tryConnect(connection)
+  .then((connection) => {
+    return sqlInsert(connection);
+  })
+  .then((result) => {
+    console.log(result);
+    return sqlSelect(connection);
+  })
+  .then((result) => {
+    console.log(result);
+    const listPeople = async () => {
+      console.log(result);
+      return result;
+    };
+
+    app.get("/", async (req, res) => {
+      const peoples = await listPeople();
+      const listPeoples =
+        "<ul>" +
+        peoples.map((item) => `<li align="center">${item.name}</li>`).join("") +
+        "</ul>";
+      res.send(`<h1 align="center">Full Cycle Rocks!</h1>\n${listPeoples}`);
+    });
+
+    app.listen(port, () => {
+      console.log(`Ouvindo na porta: ${port}`);
+    });
+  })
+  .catch((err) => {
+    console.error("Não foi possivel se conectar ao banco:", err);
+  });
+
+function sqlInsert(connection) {
+  return new Promise((resolve, reject) => {
+    const sql = `insert into people(name) values ?`;
+    const peoples = [["Obi-Wan Kenobi"], ["R2-D2"], ["Darth Vader"]];
+    connection.query(sql, [peoples], (err, result) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(result);
+        console.log(`Foram inseridas ${result.affectedRows} pessoas!`);
+      }
+    });
+  });
+}
+
+function sqlSelect(connection) {
+  return new Promise((resolve, reject) => {
+    const sql = `select * from people`;
+    connection.query(sql, (err, result) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(result);
+      }
+    });
+  });
+}

@@ -15,7 +15,7 @@ limitations under the License.
 */
 package main
 
-import "github.com/codeedu/go-hexagonal/cmd"
+import "github.com/codeedu/fc2-arquitetura-hexagonal/cmd"
 
 func main() {
 	cmd.Execute()

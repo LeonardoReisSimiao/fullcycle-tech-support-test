@@ -2,8 +2,8 @@ package db_test
 
 import (
 	"database/sql"
-	"github.com/codeedu/go-hexagonal/adapters/db"
-	"github.com/codeedu/go-hexagonal/application"
+	"github.com/codeedu/fc2-arquitetura-hexagonal/adapters/db"
+	"github.com/codeedu/fc2-arquitetura-hexagonal/application"
 	"github.com/stretchr/testify/require"
 	"log"
 	"testing"

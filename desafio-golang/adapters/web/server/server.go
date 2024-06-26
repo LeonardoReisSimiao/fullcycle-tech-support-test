@@ -1,8 +1,8 @@
 package server
 
 import (
-	"github.com/codeedu/go-hexagonal/adapters/web/handler"
-	"github.com/codeedu/go-hexagonal/application"
+	"github.com/codeedu/fc2-arquitetura-hexagonal/adapters/web/handler"
+	"github.com/codeedu/fc2-arquitetura-hexagonal/application"
 	"github.com/codegangsta/negroni"
 	"github.com/gorilla/mux"
 	"log"

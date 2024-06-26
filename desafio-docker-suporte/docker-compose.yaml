@@ -1,16 +1,18 @@
-version: '3'
+version: "3"
 
 services:
-
   app:
-    build:
-      context: app
+    build: ./app
     container_name: app
     tty: true
     volumes:
       - ./app:/usr/src/app
+    ports:
+      - "3000:3000"
     depends_on:
-      - database
+      database:
+        condition: service_healthy # inserido uma condição para esperar o 'database' iniciar corretamente antes do serviço ser iniciado
+    restart: on-failure
 
   nginx:
     image: nginx:latest
@@ -20,19 +22,28 @@ services:
     ports:
       - "8080:80"
     depends_on:
-      - app
+      app:
+        condition: service_started # condição para esperar o 'app' iniciar
 
   database:
     image: mysql:5.7
-    command: --innodb-use-native-aio=0
     container_name: database
-    restart: always
     tty: true
+    restart: always
     volumes:
       - mysql:/var/lib/mysql
+      - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql # entrypoint configurado para executar o arquivo 'init.sql'
+    ports:
+      - "3307:3306"
     environment:
       - MYSQL_DATABASE=nodedb
       - MYSQL_ROOT_PASSWORD=root
+    healthcheck: # verificação se o sistema foi iniciado completamente antes de iniciar o próximo serviço. Foi inserido um periodo de espera longo visualizando a primeira execução do docker.
+      test: ["CMD-SHELL", "mysqladmin ping -h localhost -uroot -proot"]
+      interval: 10s
+      timeout: 15s
+      retries: 5
+      start_period: 300s
 
 volumes:
   mysql:

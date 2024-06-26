@@ -1,70 +1,103 @@
-const express = require('express')
-const app = express()
+const express = require("express");
+const mysql = require("mysql2");
 
-const port = 3000
+const app = express();
+const port = 3000;
 
 const config = {
-  host: 'database',
-  user: 'root',
-  password: 'root',
-  database: 'database'
+  host: "database",
+  port: "3306",
+  user: "root",
+  password: "root",
+  database: "database",
+};
+
+const maxRetries = 5; // 5 tentativas
+const retryInterval = 20 * 1000; // 20 segundos
+
+let connection;
+let retryCount = 0;
+
+async function connectToDatabase() {
+  return new Promise((resolve, reject) => {
+    connection = mysql.createConnection(config);
+    connection.connect((err) => {
+      if (err) {
+        console.error(
+          "Tentativa: " + retryCount + ". Erro ao conectar ao banco de dados:",
+          err
+        );
+        if (retryCount < maxRetries) {
+          retryCount++;
+          console.log(`Tentando a conexão novamente em ${retryInterval}ms...`);
+          setTimeout(() => resolve(connectToDatabase()), retryInterval);
+        } else {
+          reject(
+            new Error("Falha ao conectar ao Banco após o máximo de tentativas")
+          );
+        }
+      } else {
+        console.log("Conectado ao banco de dados com sucesso!");
+        resolve(connection);
+      }
+    });
+  });
 }
 
+async function sqlInsert(connection) {
+  const sql = "INSERT INTO people (name) VALUES ?";
+  const peoples = [["Obi-Wan Kenobi"], ["R2-D2"], ["Darth Vader"]];
 
-const mysql = require('mysql')
-const connection = mysql.createConnection(config)
-
-
-const insert = sqlInsert(connection)
-
-function sqlInsert(connection) {
   return new Promise((resolve, reject) => {
-    const sql = `insert into people(name) values ?`
-    const peoples = [['Obi-Wan Kenobi'], ['R2-D2'], ['Darth Vader']]
     connection.query(sql, [peoples], (err, result) => {
       if (err) {
-        reject(err)
+        reject(err);
       } else {
-        resolve(result)
-        console.log(`Foram inseridas ${result.affectedRows} pessoas!`)
+        console.log(`Foram inseridas ${result.affectedRows} pessoas!`);
+        resolve(result);
       }
-    })
-  })
+    });
+  });
 }
 
-insert.then(result => {
-  console.log(result)
-})
-
-const select = sqlSelect(connection)
-
-function sqlSelect(connection) {
+async function sqlSelect(connection) {
+  const sql = "SELECT * FROM people";
   return new Promise((resolve, reject) => {
-    const sql = `select * from people`
     connection.query(sql, (err, result) => {
       if (err) {
-        reject(err)
+        reject(err);
       } else {
-        resolve(result)
+        resolve(result);
       }
-    })
-  })
+    });
+  });
 }
 
-const listPeople = async () => {
-  const allPeople = (await select)
-  console.log(allPeople)
-  return allPeople
+async function listPeople(connection) {
+  const allPeople = await sqlSelect(connection);
+  console.log(allPeople);
+  return allPeople;
 }
-
-// const listPeoples = '<ul>' + teste.map(item => `<li>${item}</li>`).join('') + '</ul>'
-
-app.get('/', async (req, res) => {
-  const peoples = await listPeople()
-  const listPeoples = '<ul>' + peoples.map(item => `<li align="center">${item.name}</li>`).join('') + '</ul>'
-  res.send(`<h1 align="center">Full Cycle Rocks!</h1>\n${listPeoples}`)
-})
-
-app.listen(port, () => {
-  console.log(`Ouvindo na porta: ${port}`)
-})
+app.get("/", async (req, res) => {
+  try {
+    const peoples = await listPeople(connection);
+    const listPeoples =
+      "<ul>" +
+      peoples.map((item) => `<li align="center">${item.name}</li>`).join("") +
+      "</ul>";
+    res.send(`<h1 align="center">Full Cycle Rocks!</h1>\n${listPeoples}`);
+  } catch (error) {
+    console.error("Erro ao listar pessoas:", error);
+    res.status(500).send("Erro ao listar pessoas");
+  }
+});
+app.listen(port, async () => {
+  console.log(`Ouvindo na porta: ${port}`);
+  try {
+    await connectToDatabase();
+    await sqlInsert(connection);
+  } catch (error) {
+    console.error("Erro na inicialização do servidor:", error);
+    process.exit(1); // Finaliza o processo em caso de erro crítico
+  }
+});

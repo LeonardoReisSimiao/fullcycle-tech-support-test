@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/codeedu/go-hexagonal/adapters/dto"
-	"github.com/codeedu/go-hexagonal/application"
+	"github.com/codeedu/fc2-arquitetura-hexagonal/adapters/dto"
+	"github.com/codeedu/fc2-arquitetura-hexagonal/application"
 	"github.com/codegangsta/negroni"
 	"github.com/gorilla/mux"
 )

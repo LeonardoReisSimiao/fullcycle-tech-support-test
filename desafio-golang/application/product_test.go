@@ -1,7 +1,7 @@
 package application_test
 
 import (
-	"github.com/codeedu/go-hexagonal/application"
+	"github.com/codeedu/fc2-arquitetura-hexagonal/application"
 	uuid "github.com/satori/go.uuid"
 	"github.com/stretchr/testify/require"
 	"testing"

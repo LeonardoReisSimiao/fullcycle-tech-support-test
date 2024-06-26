@@ -1,9 +1,9 @@
-
 ## Desafio Docker
 
 O objetivo desse desafio é que ao executar `docker compose up` tudo deve ser criado por completo e os containers precisam depender um do outro para subirem.
 
 Este projeto base possui diversos erros de Docker, por isso os ajustes estão apenas nos arquivos:
+
 - Dockerfile
 - docker-compose.yaml
 

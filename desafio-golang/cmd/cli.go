@@ -17,7 +17,7 @@ package cmd
 
 import (
 	"fmt"
-	"github.com/codeedu/go-hexagonal/adapters/cli"
+	"github.com/codeedu/fc2-arquitetura-hexagonal/adapters/cli"
 	"github.com/spf13/cobra"
 )
 

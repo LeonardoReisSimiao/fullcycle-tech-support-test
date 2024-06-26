@@ -1,4 +1,4 @@
-module github.com/LucianTavares/desafio-golang
+module github.com/codeedu/fc2-arquitetura-hexagonal
 
 go 1.16
 
@@ -12,5 +12,5 @@ require (
 	github.com/satori/go.uuid v1.2.0
 	github.com/spf13/cobra v1.8.0
 	github.com/spf13/viper v1.7.1
-	github.com/stretchr/testify v1.9.0
+	github.com/stretchr/testify v1.7.0
 )

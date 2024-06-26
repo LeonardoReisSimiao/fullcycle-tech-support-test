@@ -18,10 +18,10 @@ package cmd
 import (
 	"database/sql"
 	"fmt"
-	"github.com/codeedu/go-hexagonal/application"
+	"github.com/codeedu/fc2-arquitetura-hexagonal/application"
 	"os"
 	"github.com/spf13/cobra"
-	dbInfra "github.com/codeedu/go-hexagonal/adapters/db"
+	dbInfra "github.com/codeedu/fc2-arquitetura-hexagonal/adapters/db"
 
 	homedir "github.com/mitchellh/go-homedir"
 	"github.com/spf13/viper"
@@ -35,7 +35,7 @@ var productService = application.ProductService{Persistence: productDb}
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
-	Use:   "go-hexagonal",
+	Use:   "fc2-arquitetura-hexagonal",
 	Short: "A brief description of your application",
 	Long: `A longer description that spans multiple lines and likely contains
 examples and usage of using your application. For example:
@@ -61,7 +61,7 @@ func init() {
 	// Cobra supports persistent flags, which, if defined here,
 	// will be global for your application.
 
-	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.go-hexagonal.yaml)")
+	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.fc2-arquitetura-hexagonal.yaml)")
 
 	// Cobra also supports local flags, which will only run
 	// when this action is called directly.
@@ -78,9 +78,9 @@ func initConfig() {
 		home, err := homedir.Dir()
 		cobra.CheckErr(err)
 
-		// Search config in home directory with name ".go-hexagonal" (without extension).
+		// Search config in home directory with name ".fc2-arquitetura-hexagonal" (without extension).
 		viper.AddConfigPath(home)
-		viper.SetConfigName(".go-hexagonal")
+		viper.SetConfigName(".fc2-arquitetura-hexagonal")
 	}
 
 	viper.AutomaticEnv() // read in environment variables that match
